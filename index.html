@@ -1,0 +1,683 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>EulerMath — Kalkulator Eksponensial Natural</title>
+
+<!-- Fonts & Icons -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+
+<!-- Bootstrap -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"/>
+
+<!-- Polyfill & MathJax -->
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+<!-- Utilities CSS (rapi & konsisten) -->
+<style>
+:root{
+  --primary: #0ea5e9;
+  --accent: #06b6d4;
+  --muted: #64748b;
+  --success: #10b981;
+  --danger: #ef4444;
+  --card-shadow: 0 6px 20px rgba(17,24,39,0.06);
+}
+
+/* Page */
+body {
+  background: #f7fbff;
+  color: #0b1b23;
+  font-family: Inter, "Segoe UI", Tahoma, system-ui, -apple-system, "Helvetica Neue", Arial;
+  -webkit-font-smoothing:antialiased;
+}
+.container { max-width: 1140px; }
+
+/* Header */
+.header-top {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+  color: white;
+  padding: 18px 0;
+}
+.header-top .brand { font-weight:700; font-size:1.25rem; }
+.header-top .subtitle { color: rgba(255,255,255,0.88); font-size:0.92rem; }
+
+/* Navbar */
+.navbar { background: #fff; border-bottom: 1px solid rgba(15,23,42,0.04); }
+.nav-link { color: var(--muted); font-weight: 600; transition: color .18s ease; }
+.nav-link:hover, .nav-link.active { color: var(--primary) !important; }
+
+/* Cards & boxes */
+.card, .card-body { border-radius: 12px; box-shadow: var(--card-shadow); }
+.card-compact { border: 1px solid rgba(15,23,42,0.03); }
+
+/* Inputs & preview */
+.math-input-wrap math-field { width:100%; min-height:46px; border-radius:8px; }
+.preview-box { background:#ffffff; border-radius:8px; padding:12px; border:1px solid rgba(2,6,23,0.04); min-height:34px; }
+
+/* Helpers */
+.expr { background:#0f172a; color:#e6eef8; padding:.75rem; border-radius:8px; font-family: "Courier New", monospace; font-size:.9rem; overflow-x:auto; white-space:pre-wrap; }
+.example-badge { cursor:pointer; display:inline-block; padding:.35rem .7rem; background:#f1f5f9; border:1px solid #e6eef8; border-radius:6px; margin:.25rem; transition:.18s; font-size:.9rem; }
+.example-badge:hover { background:var(--primary); color:#fff; border-color:var(--primary); transform:translateY(-2px); box-shadow:0 6px 18px rgba(14,165,233,0.12); }
+.result-box { background: linear-gradient(180deg,#e9f8ff,#fbfdff); border-left:4px solid var(--primary); padding:14px; border-radius:8px; margin-top:10px; }
+.formula-box { background:#f0fbff; border:1px solid #dbefff; padding:10px; border-radius:8px; }
+
+/* Steps */
+.step-box { background:#fff; border:1px solid #edf2fb; border-radius:10px; padding:12px; margin-bottom:12px; display:flex; gap:12px; align-items:flex-start; }
+.step-number { min-width:34px; height:34px; border-radius:50%; background:var(--primary); color:white; display:inline-flex; align-items:center; justify-content:center; font-weight:700; }
+
+/* Graph container */
+#graph { min-height:260px; background:#fff; border-radius:10px; border:1px solid rgba(15,23,42,0.04); }
+
+/* Print: hide buttons and interactive hints */
+@media print {
+  .no-print { display:none !important; }
+  body { background:white; color:black; }
+}
+
+/* Small text helpers */
+.small-muted { color:var(--muted); font-size:0.92rem; }
+.badge-soft { background: rgba(14,165,233,0.08); color:var(--primary); border-radius:6px; padding:.25rem .5rem; font-weight:600; }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="header-top">
+  <div class="container d-flex flex-column flex-md-row align-items-center justify-content-between">
+    <div>
+      <div class="brand"><i class="fas fa-calculator me-2"></i>EulerMath Pro</div>
+      <div class="subtitle">Kalkulator Eksponensial — langkah detail & grafik</div>
+    </div>
+    <div class="text-md-end mt-2 mt-md-0 small-muted">
+      <span class="badge-soft me-2"><i class="fas fa-circle-info me-1"></i>500+ titik grafik</span>
+      <span class="small-muted">v1.0</span>
+    </div>
+  </div>
+</header>
+
+<!-- NAVBAR -->
+<nav class="navbar navbar-expand-lg shadow-sm" 
+     style="background:#ffffff;">
+    <div class="container">
+
+        <!-- Mobile Toggle -->
+        <button class="navbar-toggler" type="button" 
+                data-bs-toggle="collapse" data-bs-target="#mainNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <!-- Logo / Brand -->
+        <a class="navbar-brand fw-bold text-primary d-lg-none" href="index.html">
+            <i class="fas fa-calculator me-2"></i>EulerMath Pro
+        </a>
+
+        <!-- Menu -->
+        <div class="collapse navbar-collapse justify-content-center" id="mainNav">
+            <ul class="navbar-nav align-items-center">
+
+                <li class="nav-item">
+                    <a class="nav-link me-3" href="index.html">
+                        <i class="fas fa-home me-1"></i>Beranda
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link me-3" href="lognatural.html">
+                        Logaritma Natural
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link me-3" href="invers.html">
+                        Fungsi Invers
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link me-3" href="eksponennatural.html">
+                        Eksponen Alami
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link me-3" href="eksplog.html">
+                        Eksponen & Log Umum
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link me-3" href="pertumbuhan.html">
+                        Pertumbuhan & Peluruhan
+                    </a>
+                </li>
+
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<!-- MAIN -->
+<main class="container my-4">
+
+  <div class="text-center mb-4">
+    <h2 class="fw-bold">Kalkulator Eksponensial Natural <small class="text-muted">\(e^x\)</small></h2>
+    <p class="small-muted">Hitung, turunkan, sederhanakan, dan visualisasikan fungsi eksponensial. Masukkan ekspresi memakai LaTeX atau klik contoh cepat.</p>
+  </div>
+
+  <div class="row gy-4">
+    <!-- LEFT: tools & outputs -->
+    <div class="col-lg-8">
+      <div class="card card-compact p-3">
+        <div class="d-flex align-items-center justify-content-between mb-3">
+          <div class="fw-semibold"><i class="fas fa-calculator me-2"></i> Kalkulator Utama</div>
+          <div class="small-muted">Interaktif • MathLive + MathJax • MathJS</div>
+        </div>
+
+        <!-- input math live -->
+        <div class="math-input-wrap">
+          <!-- math-field element; value editable by MathLive (module imported in script) -->
+          <math-field id="mathInput" virtual-keyboard-mode="onfocus" style="--mf-font-size:18px">e^{2x}+3</math-field>
+        </div>
+
+        <div class="row mt-3 g-3">
+          <div class="col-md-6">
+            <label class="form-label fw-semibold">Nilai x (opsional)</label>
+            <input id="xValue" type="text" class="form-control" placeholder="Contoh: 2, 3.5, -1">
+            <small class="text-muted"><i class="fas fa-info-circle me-1"></i>Kosongkan untuk melihat grafik</small>
+          </div>
+
+          <div class="col-md-6 d-flex gap-2 align-items-end flex-wrap">
+            <button id="btnHitung" class="btn btn-primary flex-fill no-print"><i class="fas fa-calculator me-1"></i>Hitung</button>
+            <button id="btnTurun" class="btn btn-outline-warning flex-fill no-print"><i class="fas fa-level-up-alt me-1"></i>Turunkan</button>
+            <button id="btnSeder" class="btn btn-outline-secondary flex-fill no-print"><i class="fas fa-compress me-1"></i>Sederhanakan</button>
+            <button id="btnGraf" class="btn btn-outline-info flex-fill no-print"><i class="fas fa-chart-line me-1"></i>Grafik</button>
+          </div>
+        </div>
+
+        <!-- preview -->
+        <div class="mt-3 border rounded p-3 bg-white">
+          <div class="fw-semibold mb-2"><i class="fas fa-eye me-1"></i>Preview</div>
+          <div id="preview" class="preview-box fs-5"></div>
+        </div>
+
+        <!-- outputs grid -->
+        <div class="mt-3">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <div class="fw-semibold small">LaTeX Input</div>
+              <div id="latexOut" class="mt-2 p-2 formula-box" style="min-height:34px"></div>
+            </div>
+
+            <div class="col-md-6">
+              <div class="fw-semibold small">MathJS Conversion</div>
+              <pre id="mathjsOut" class="expr mt-2" style="min-height:64px"></pre>
+            </div>
+
+            <div class="col-md-6">
+              <div class="fw-semibold small">Disederhanakan</div>
+              <div id="simplifyOut" class="mt-2 result-box" style="min-height:48px"></div>
+            </div>
+
+            <div class="col-md-6">
+              <div class="fw-semibold small">Turunan \( f'(x) \)</div>
+              <div id="derivativeOut" class="mt-2 result-box" style="min-height:48px"></div>
+            </div>
+
+            <div class="col-12">
+              <div class="fw-semibold small">Hasil Evaluasi</div>
+              <div id="evaluationOut" class="mt-2"></div>
+            </div>
+
+            <div class="col-12">
+              <div class="fw-semibold small">Status</div>
+              <div id="parserMsg" class="mt-2 small-muted"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- steps (initially hidden) -->
+        <div id="stepsSection" class="mt-4" style="display:none">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="fw-bold mb-0"><i class="fas fa-list-ol me-2"></i>Langkah Pengerjaan Detail</h5>
+            <span class="badge-soft" id="stepCount">0 langkah</span>
+          </div>
+          <div id="stepsContainer"></div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- RIGHT: examples, graph, tips -->
+    <div class="col-lg-4">
+      <div class="card card-compact mb-3 p-3">
+        <div class="d-flex align-items-center justify-content-between mb-2">
+          <div class="fw-semibold"><i class="fas fa-lightbulb me-2"></i>Contoh Cepat</div>
+          <div class="small-muted">Klik untuk muat</div>
+        </div>
+        <div>
+          <div class="small-muted mb-2">Klik untuk menggunakan:</div>
+          <div id="examples" class="d-flex flex-wrap">
+            <div class="example-badge" data-latex="e^{x}">e<sup>x</sup></div>
+            <div class="example-badge" data-latex="e^{2x}">e<sup>2x</sup></div>
+            <div class="example-badge" data-latex="e^{-x}">e<sup>-x</sup></div>
+            <div class="example-badge" data-latex="3e^{x}">3e<sup>x</sup></div>
+            <div class="example-badge" data-latex="e^{x+1}">e<sup>x+1</sup></div>
+            <div class="example-badge" data-latex="e^{\\sin(x)}">e<sup>sin(x)</sup></div>
+            <div class="example-badge" data-latex="\\frac{e^{x}}{2}">e<sup>x</sup>/2</div>
+            <div class="example-badge" data-latex="e^{x^2}">e<sup>x²</sup></div>
+            <div class="example-badge" data-latex="e^{x}+e^{-x}">e<sup>x</sup>+e<sup>-x</sup></div>
+            <div class="example-badge" data-latex="2e^{3x}-5">2e<sup>3x</sup>-5</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card card-compact mb-3 p-3">
+        <div class="d-flex align-items-center justify-content-between mb-2">
+          <div class="fw-semibold"><i class="fas fa-chart-area me-2"></i>Visualisasi Grafik</div>
+          <div class="small-muted"><span class="badge-soft">500+ titik</span></div>
+        </div>
+        <div class="p-2" id="graph"></div>
+      </div>
+
+      <div class="card card-compact p-3">
+        <div class="fw-semibold mb-2"><i class="fas fa-book me-2"></i>Panduan & Tips</div>
+        <div class="small text-muted">
+          <p><strong>Format LaTeX:</strong></p>
+          <ul class="mb-2">
+            <li><code>e^{x}</code> - Eksponensial</li>
+            <li><code>\\frac{a}{b}</code> - Pecahan</li>
+            <li><code>\\sqrt{x}</code> - Akar</li>
+            <li><code>\\sin(x),\\cos(x)</code> - Trigonometri</li>
+          </ul>
+          <p><strong>Fitur:</strong></p>
+          <ul class="mb-0">
+            <li>Langkah matematika detail</li>
+            <li>Grafik akurasi tinggi</li>
+            <li>Analisis turunan otomatis</li>
+          </ul>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</main>
+<!-- SCRIPTS (letakkan di akhir body) -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/11.11.0/math.js"></script>
+<script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
+
+<!-- Module untuk MathLive; kita import dan tunggu definisi math-field -->
+<script type="module">
+import 'https://unpkg.com/mathlive@0.98.1/dist/mathlive.min.mjs';
+await customElements.whenDefined('math-field');
+
+// Element references (kept same as original)
+const mf = document.getElementById('mathInput');
+const preview = document.getElementById('preview');
+const latexOut = document.getElementById('latexOut');
+const mathjsOut = document.getElementById('mathjsOut');
+const simplifyOut = document.getElementById('simplifyOut');
+const derivativeOut = document.getElementById('derivativeOut');
+const evaluationOut = document.getElementById('evaluationOut');
+const parserMsg = document.getElementById('parserMsg');
+const xValueInput = document.getElementById('xValue');
+const graphEl = document.getElementById('graph');
+const stepsSection = document.getElementById('stepsSection');
+const stepsContainer = document.getElementById('stepsContainer');
+const stepCount = document.getElementById('stepCount');
+
+// small helper sets
+const FUNCS = new Set(['exp','sqrt','sin','cos','tan','log','abs']);
+
+// Utility functions (clean, parse, convert latex -> mathjs safe expression)
+function stripLatex(s){
+  if(!s) return '';
+  let t = s.trim();
+  // remove optional surrounding \( \) or $$ $$ or single $
+  if(t.startsWith('\\(') && t.endsWith('\\)')) t = t.slice(2,-2);
+  t = t.replace(/^\$+|\$+$/g, '');
+  return t;
+}
+function cleanLatex(s){
+  if(!s) return '';
+  return s.replace(/\\left|\\right|\\,/g,'').replace(/\\ /g,'').replace(/\\!/g,'').trim();
+}
+function findBrace(s, start){
+  if (s[start] !== '{') return -1;
+  let depth=0;
+  for(let i=start;i<s.length;i++){
+    if(s[i]==='{') depth++;
+    else if(s[i]==='}') { depth--; if(depth===0) return i; }
+  }
+  return -1;
+}
+function latexToMathjs(latex){
+  if(!latex) return '';
+  let s = stripLatex(latex);
+  s = cleanLatex(s);
+
+  // handle root with index \sqrt[3]{x} => (x)^(1/3)
+  while(true){
+    const m = /\\sqrt\[(.+?)\]\{/.exec(s);
+    if(!m) break;
+    const idx = m.index;
+    const open = s.indexOf('{', idx + m[0].length - 1);
+    if(open === -1) break;
+    const close = findBrace(s, open);
+    if(close === -1) break;
+    const deg = m[1];
+    const content = s.slice(open+1, close);
+    s = s.slice(0, idx) + '('+content+')^(1/'+deg+')' + s.slice(close+1);
+  }
+
+  // simple sqrt
+  s = s.replace(/\\sqrt\{([^}]*)\}/g, 'sqrt($1)');
+
+  // fraction \frac{a}{b} -> (a)/(b)
+  while(true){
+    const i = s.indexOf('\\frac');
+    if(i === -1) break;
+    const f1 = s.indexOf('{', i+5);
+    if(f1 === -1) break;
+    const c1 = findBrace(s, f1);
+    if(c1 === -1) break;
+    const num = s.slice(f1+1, c1);
+    const f2 = s.indexOf('{', c1+1);
+    if(f2 === -1) break;
+    const c2 = findBrace(s, f2);
+    if(c2 === -1) break;
+    const den = s.slice(f2+1, c2);
+    s = s.slice(0,i) + '('+num+')/('+den+')' + s.slice(c2+1);
+  }
+
+  // e^{...} -> exp(...)
+  s = s.replace(/e\^\{([^}]*)\}/g, 'exp($1)');
+  s = s.replace(/e\^([A-Za-z0-9_]+)/g, 'exp($1)');
+  s = s.replace(/e\^\(([^)]*)\)/g, 'exp($1)');
+
+  // convert modifiers
+  s = s.replace(/\\cdot|\\times/g, '*');
+  s = s.replace(/\\sin/g,'sin').replace(/\\cos/g,'cos').replace(/\\tan/g,'tan');
+  s = s.replace(/\\ln/g,'log').replace(/\\log/g,'log');
+
+  // remove leftover braces
+  s = s.replace(/[{}]/g,'');
+  // insert implicit multiplication between number and variable: 2x -> 2*x
+  s = s.replace(/(\d)([a-zA-Z])/g, '$1*$2');
+  s = s.replace(/(\d)\(/g, '$1*(');
+  s = s.replace(/\)\(/g, ')*(');
+
+  // ensure function calls are explicit: e.g. sin( ... )
+  s = s.replace(/([a-zA-Z]+)\(/g, function(m, name){
+    return FUNCS.has(name) ? m : name+'*(';
+  });
+
+  return s.replace(/\s+/g,'');
+}
+
+// render preview (MathJax)
+function renderPreview(latex){
+  const t = stripLatex(latex);
+  preview.innerHTML = `\\(${t}\\)`;
+  if(window.MathJax && MathJax.typesetPromise) MathJax.typesetPromise([preview]).catch(()=>{});
+}
+
+// toTeX using mathjs
+function toTex(expr){
+  try{
+    const node = math.parse(expr);
+    return node ? node.toTex({parenthesis:'keep',implicit:'hide'}) : expr;
+  }catch(e){
+    return expr;
+  }
+}
+
+// compute wrapper: parse, simplify, derivative
+function computeExpr(expr){
+  try{
+    const node = math.parse(expr);
+    const simp = math.simplify(node).toString();
+    let der;
+    try { der = math.derivative(node, 'x').toString(); } catch(e) { der = 'Tidak dapat diturunkan'; }
+    return { ok:true, node, simp, der };
+  }catch(e){
+    return { ok:false, error: e && e.message ? e.message : String(e) };
+  }
+}
+
+// evaluate expression optionally at x
+function evalAt(expr, xVal){
+  try{
+    if(xVal !== '' && xVal !== null && xVal !== undefined){
+      const num = parseFloat(xVal);
+      if(isNaN(num)) return { ok:false, error:'Nilai x harus angka' };
+      const value = math.evaluate(expr, { x: num });
+      return { ok:true, value, isLarge: Math.abs(value) > 1e6, isSmall: Math.abs(value) < 1e-6 && value !== 0 };
+    }
+    return { ok:true, value: null };
+  }catch(e){
+    return { ok:false, error: e && e.message ? e.message : String(e) };
+  }
+}
+
+// plotting helpers
+function makeTrace(expr, name='f(x)', color='#0ea5e9'){
+  const xs = []; const ys = [];
+  const step = 0.04;
+  for(let x=-10; x<=10; x+=step){
+    xs.push(Number(x.toFixed(3)));
+    try{
+      const y = math.evaluate(expr, { x: x });
+      if(!isFinite(y) || Math.abs(y) > 1e12) ys.push(null);
+      else ys.push(y);
+    }catch{
+      ys.push(null);
+    }
+  }
+  return { x: xs, y: ys, mode:'lines', type:'scatter', name: name, line:{ width: 2.6, color } };
+}
+function plotSinglePoint(value){
+  Plotly.newPlot(graphEl, [{ x:[0], y:[value], mode:'markers', marker:{ size:10, color:'#0ea5e9' } }], { margin:{t:30,b:40,l:50,r:20}, paper_bgcolor:'#fff', plot_bgcolor:'#fff' }, { responsive:true });
+}
+function clearGraph(){ if(graphEl && typeof Plotly !== 'undefined') Plotly.purge(graphEl); }
+
+// show input & conversion
+function showInput(latex){
+  const cleaned = stripLatex(latex);
+  latexOut.innerHTML = `\\(${cleaned}\\)`;
+  if(window.MathJax && MathJax.typesetPromise) MathJax.typesetPromise([latexOut]).catch(()=>{});
+  const expr = latexToMathjs(latex);
+  mathjsOut.textContent = expr || '(kosong)';
+  return expr;
+}
+
+// messages
+function showError(msg){ parserMsg.innerHTML = `<div class="text-danger"><i class="fas fa-exclamation-circle me-1"></i>${msg}</div>`; }
+function showOk(msg){ parserMsg.innerHTML = `<div class="text-success"><i class="fas fa-check-circle me-1"></i>${msg}</div>`; }
+
+// step generator (keperluan edukasi)
+function buildSteps(type, latex, expr, result){
+  const steps = [];
+  const clean = stripLatex(latex);
+  if(type === 'calc'){
+    steps.push({ title:'Fungsi yang diberikan', content:`<div class="formula-box">\\(f(x) = ${clean}\\)</div>` });
+    if(result.xVal !== undefined && result.xVal !== null){
+      steps.push({ title:'Substitusi x', content:`<div class="substep">\\(f(${result.xVal}) = ${clean.replace(/x/g,'('+result.xVal+')')}\\)</div>` });
+      if(result.eval && result.eval.ok && result.eval.value !== null){
+        steps.push({ title:'Hasil Akhir', content:`<div class="result-box">\\(f(${result.xVal}) = ${result.eval.value}\\)</div>` });
+      }
+    } else {
+      if(result.comp && result.comp.ok){
+        steps.push({ title:'Bentuk Sederhana', content:`<div class="formula-box">\\(f(x) = ${toTex(result.comp.simp)}\\)</div>` });
+      }
+      steps.push({ title:'Sifat Fungsi Eksponensial', content:`<ul><li>Selalu positif: \\(e^x > 0\\)</li><li>Domain: semua bilangan real</li></ul>` });
+    }
+  } else if(type === 'der'){
+    steps.push({ title:'Fungsi Asli', content:`<div class="formula-box">\\(f(x) = ${clean}\\)</div>` });
+    steps.push({ title:'Konsep Turunan', content:`Turunan \\(f'(x)\\) mengukur laju perubahan fungsi.` });
+    if(result.comp && result.comp.ok){
+      steps.push({ title:'Hasil Turunan', content:`<div class="formula-box">\\(f'(x) = ${toTex(result.comp.der)}\\)</div>` });
+    }
+  } else if(type === 'simp'){
+    steps.push({ title:'Ekspresi Asli', content:`<div class="formula-box">\\(${clean}\\)</div>` });
+    if(result.comp && result.comp.ok) steps.push({ title:'Hasil Sederhana', content:`<div class="formula-box">\\(${toTex(result.comp.simp)}\\)</div>` });
+  } else if(type === 'graph'){
+    steps.push({ title:'Grafik Fungsi', content:`<div class="formula-box">\\(f(x)=${clean}\\)</div>` });
+    if(result.xVal){ steps.push({ title:'Titik Evaluasi', content:`Titik: <strong>(${result.xVal}, ${result.yVal})</strong>` }); }
+  }
+  return steps;
+}
+function showSteps(type, latex, expr, result){
+  stepsContainer.innerHTML = '';
+  const steps = buildSteps(type, latex, expr, result);
+  stepCount.textContent = `${steps.length} langkah`;
+  steps.forEach((s,i)=>{
+    const el = document.createElement('div');
+    el.className = 'step-box';
+    el.innerHTML = `<div class="step-number">${i+1}</div><div style="flex:1"><strong>${s.title}</strong><div class="mt-2">${s.content}</div></div>`;
+    stepsContainer.appendChild(el);
+  });
+  if(window.MathJax && MathJax.typesetPromise) MathJax.typesetPromise([stepsContainer]).catch(()=>{});
+  stepsSection.style.display = steps.length ? 'block' : 'none';
+}
+
+// Event wiring
+mf.addEventListener('input', () => {
+  const latex = mf.getValue();
+  renderPreview(latex);
+  showInput(latex);
+  showOk('Parser siap');
+});
+
+// example badges
+document.querySelectorAll('.example-badge').forEach(b => {
+  b.addEventListener('click', () => {
+    mf.setValue(b.dataset.latex);
+    const latex = mf.getValue();
+    renderPreview(latex);
+    showInput(latex);
+    showOk('Contoh dimuat');
+  });
+});
+
+// BUTTON: Hitung (evaluate & simplify & derivative)
+document.getElementById('btnHitung').addEventListener('click', () => {
+  const latex = mf.getValue();
+  const expr = showInput(latex);
+  if(!expr){ evaluationOut.innerHTML = '<div class="text-danger">Ekspresi kosong</div>'; clearGraph(); return; }
+
+  const comp = computeExpr(expr);
+  if(!comp.ok){
+    showError(comp.error);
+    simplifyOut.innerHTML = '<div class="text-danger">Error</div>';
+    derivativeOut.innerHTML = '<div class="text-danger">Error</div>';
+  } else {
+    showOk('Perhitungan berhasil');
+    simplifyOut.innerHTML = `\\(${toTex(comp.simp)}\\)`;
+    derivativeOut.innerHTML = `\\(${toTex(comp.der)}\\)`;
+    if(window.MathJax && MathJax.typesetPromise) MathJax.typesetPromise([simplifyOut, derivativeOut]).catch(()=>{});
+  }
+
+  const xVal = xValueInput.value.trim();
+  const evalRes = evalAt(expr, xVal);
+  if(!evalRes.ok){
+    evaluationOut.innerHTML = `<div class="text-danger">Error: ${evalRes.error}</div>`;
+    showError(evalRes.error);
+    clearGraph();
+  } else if(evalRes.value === null){
+    evaluationOut.innerHTML = '<div class="small-muted">Nilai x kosong — tidak dievaluasi</div>';
+    clearGraph();
+  } else {
+    evaluationOut.innerHTML = `<div class="result-box"><strong>Hasil:</strong> ${evalRes.value}</div>`;
+    plotSinglePoint(evalRes.value);
+  }
+
+  showSteps('calc', latex, expr, { comp, eval: evalRes, xVal });
+});
+
+// BUTTON: Simplify
+document.getElementById('btnSeder').addEventListener('click', () => {
+  const latex = mf.getValue();
+  const expr = showInput(latex);
+  if(!expr){ simplifyOut.innerHTML = '<div class="text-danger">Ekspresi kosong</div>'; return; }
+  const comp = computeExpr(expr);
+  if(!comp.ok){ simplifyOut.innerHTML = `<div class="text-danger">${comp.error}</div>`; showError(comp.error); }
+  else { showOk('Penyederhanaan berhasil'); simplifyOut.innerHTML = `\\(${toTex(comp.simp)}\\)`; if(window.MathJax && MathJax.typesetPromise) MathJax.typesetPromise([simplifyOut]).catch(()=>{}); }
+  showSteps('simp', latex, expr, { comp });
+});
+
+// BUTTON: Derivative + overlay graph f and f'
+document.getElementById('btnTurun').addEventListener('click', () => {
+  const latex = mf.getValue();
+  const expr = showInput(latex);
+  if(!expr){ derivativeOut.innerHTML = '<div class="text-danger">Ekspresi kosong</div>'; return; }
+
+  const comp = computeExpr(expr);
+  if(!comp.ok){ derivativeOut.innerHTML = `<div class="text-danger">${comp.error}</div>`; showError(comp.error); return; }
+  showOk('Turunan berhasil');
+  derivativeOut.innerHTML = `\\(${toTex(comp.der)}\\)`;
+  if(window.MathJax && MathJax.typesetPromise) MathJax.typesetPromise([derivativeOut]).catch(()=>{});
+
+  try {
+    const t1 = makeTrace(expr, 'f(x)', '#0ea5e9');
+    const t2 = makeTrace(comp.der, "f'(x)", '#f59e0b');
+    t2.line = t2.line || {}; t2.line.dash = 'dash';
+    Plotly.newPlot(graphEl, [t1, t2], { margin:{t:30,b:40,l:50,r:20}, xaxis:{title:'x'}, yaxis:{title:'y'}, paper_bgcolor:'#fff', plot_bgcolor:'#fff', legend:{x:0.02,y:0.98} }, { responsive:true });
+    showSteps('der', latex, expr, { comp });
+  } catch(e){
+    console.error(e); showError('Gagal menggambar grafik turunan: '+(e.message||e));
+  }
+});
+
+// BUTTON: Grafik (plot f(x) and optionally point)
+document.getElementById('btnGraf').addEventListener('click', () => {
+  const latex = mf.getValue();
+  const expr = showInput(latex);
+  if(!expr){ evaluationOut.innerHTML = '<div class="text-danger">Ekspresi kosong</div>'; return; }
+  const xVal = xValueInput.value.trim();
+
+  try {
+    const trace = makeTrace(expr);
+    Plotly.newPlot(graphEl, [trace], { margin:{t:30,b:40,l:50,r:20}, xaxis:{title:'x'}, yaxis:{title:'y'}, paper_bgcolor:'#fff', plot_bgcolor:'#fff' }, { responsive:true });
+
+    if(xVal !== ''){
+      const num = parseFloat(xVal);
+      if(!isNaN(num)){
+        const yVal = math.evaluate(expr, { x: num });
+        Plotly.addTraces(graphEl, { x:[num], y:[yVal], mode:'markers', marker:{ color:'#ef4444', size:10 }, name:`x=${num}` });
+        evaluationOut.innerHTML = `<div class="result-box"><strong>f(${num}) =</strong> ${yVal}</div>`;
+        showOk('Grafik dengan titik evaluasi dibuat');
+        showSteps('graph', latex, expr, { xVal:num, yVal });
+      } else { throw new Error('Nilai x tidak valid'); }
+    } else {
+      evaluationOut.innerHTML = '<div class="small-muted">Grafik fungsi ditampilkan</div>';
+      showOk('Grafik berhasil dibuat');
+      showSteps('graph', latex, expr, {});
+    }
+  } catch(e){
+    evaluationOut.innerHTML = `<div class="text-danger">Error: ${e.message||e}</div>`;
+    showError(e.message||String(e));
+  }
+});
+
+// initialize preview & parser
+const initialLatex = mf.getValue();
+renderPreview(initialLatex);
+showInput(initialLatex);
+showOk('Parser siap');
+
+const current = location.pathname.split("/").slice(-1)[0];
+    document.querySelectorAll(".nav-link").forEach(a => {
+        if (a.getAttribute("href") === current) {
+            a.classList.add("active");
+            a.style.color = "#0ea5e9";
+            a.style.fontWeight = "600";
+        }
+    });
+    
+</script>
+</body>
+</html>
