@@ -12,11 +12,17 @@
 
 <style>
 :root{--primary:#0ea5e9;}
-body{background:#f8fafc;font-family:'Segoe UI',Tahoma,sans-serif}
-.nav-link{color:#64748b;font-weight:500;transition:.2s}
-.nav-link:hover,.nav-link.active{color:var(--primary) !important}
+body{background:#f8fafc;font-family:'Segoe UI'}
+.nav-link{color:#64748b;font-weight:500;}
+.nav-link:hover,.nav-link.active{color:var(--primary)!important}
 .card{border:none;border-radius:12px;box-shadow:0 2px 8px rgba(0,0,0,.08)}
-.formula-box{background:#e0f2fe;border-left:4px solid var(--primary);padding:1rem;border-radius:8px;margin:1rem 0;font-size:1.2rem}
+.formula-box{background:#e0f2fe;border-left:4px solid var(--primary);padding:1rem;border-radius:8px;font-size:1.2rem}
+
+/* fix toggler */
+.navbar-toggler{border-color:#cbd5e1;}
+.navbar-toggler-icon{
+    background-image:url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba(71,85,105, 1)' stroke-width='2' stroke-linecap='round' stroke-miterlimit='10' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+}
 </style>
 </head>
 
@@ -25,8 +31,8 @@ body{background:#f8fafc;font-family:'Segoe UI',Tahoma,sans-serif}
 <!-- HEADER -->
 <div class="p-3 text-center border-bottom" style="background:linear-gradient(135deg,#0ea5e9,#06b6d4)">
     <div class="container">
-        <span class="fw-bold fs-4 text-white"><i class="fas fa-superscript me-2"></i>Logaritma Natural</span>
-        <p class="text-white-50 mb-0 small">Materi Lengkap Fungsi Transenden</p>
+        <span class="fw-bold fs-4 text-white"><i class="fas fa-calculator me-2"></i>Logaritma Natural</span>
+        <p class="text-white-50 small mb-0">Konsep Dasar Logaritma Berbasis e</p>
     </div>
 </div>
 
@@ -52,38 +58,27 @@ body{background:#f8fafc;font-family:'Segoe UI',Tahoma,sans-serif}
 
 <!-- CONTENT -->
 <main class="container my-4">
-
 <div class="card p-4">
-    <h2 class="fw-bold">Logaritma Natural</h2>
-    <p class="text-muted">Logaritma natural memiliki basis <em>e</em>, konstanta Euler dengan nilai sekitar <strong>2.7182818…</strong></p>
 
-    <h4 class="mt-4">Rumus Utama</h4>
-    <div class="formula-box">
-        \[
-        \ln(e^x) = x
-        \]
-        \[
-        \frac{d}{dx}\ln(x) = \frac{1}{x}
-        \]
-    </div>
+<h2 class="fw-bold">Apa Itu Logaritma Natural?</h2>
+<p class="text-muted">
+    Logaritma natural adalah logaritma dengan basis bilangan istimewa \( e \approx 2.71828 \).
+</p>
 
-    <h4>Contoh Soal</h4>
-    <ol>
-        <li>
-            Tentukan turunan dari:
-            \[
-            f(x) = \ln(3x + 1)
-            \]
-        </li>
-        <li>
-            Hitung nilai:
-            \[
-            \ln(e^{5})
-            \]
-        </li>
-    </ol>
+<h4 class="mt-4 fw-semibold">Rumus Dasar</h4>
+<div class="formula-box">
+\[
+\ln(e^x) = x, \qquad 
+\frac{d}{dx}\ln(x) = \frac{1}{x}
+\]
 </div>
 
+<h4 class="mt-4 fw-semibold">Penjelasan</h4>
+<p>
+Logaritma natural banyak muncul dalam perhitungan pertumbuhan, peluruhan, serta fungsi-fungsi yang melibatkan eksponen.
+</p>
+
+</div>
 </main>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
